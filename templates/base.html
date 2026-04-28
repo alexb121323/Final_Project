@@ -7,7 +7,9 @@
 </head>
 <body>
     <div class="menu">
-        <a href="{{ url_for('index')}}">Home</a>
+        <a href="{{ url_for('reservations.index')}}">Home</a>
+        <a href="{{ url_for('reservations.admin')}}">Admin</a>
+        <a href="{{ url_for('reservations.reservation')}}">Reservation</a>
     </div>
     <div class="div-container">
         {% with messages = get_flashed_messages(with_categories=true) %}

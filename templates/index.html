@@ -1,3 +1,17 @@
-{% extends 'base.html%}
+{% extends 'base.html' %}
 
 {% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>IT-4320 Trip Reservation System</h1><br><br>
+    <h3>Welcome to the IT-4320 Trip Reservation system. Use the select box to make a reservation or login as administrator</h3><br><br>
+    <form method="POST" action="{{ url_for('reservations.index') }}">
+        <label for="menu_option">Menu Option:</label><br>
+        <select id="menu_option" name="menu_option">
+            <option value="">Choose an option</option>
+            <option value="Reservation">Reservation</option>
+            <option value="Administrator">Administrator</option>
+        </select><br><br>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
