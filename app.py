@@ -26,11 +26,11 @@ class Reservation(db.Model):
 
 #Create a class for admin table
 class Admin(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(10), primary_key=True)
     password = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
-        return f'<Admin {self.id}>'
+        return f'<Admin {self.username}>'
 
 #Create an index route for GET and POST methods
 @reservations_bp.route('/', methods=['GET', 'POST'])
