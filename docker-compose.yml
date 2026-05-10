@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: reservations_app_image
+    container_name: reservationApp-container
+    ports:
+      - "5019:5019"
+    volumes:
+      - .:/app
+      - ./data_files:/app/data_files
+    environment:
+      - FLASK_DEBUG=1
+      - FLASK_RUN_HOST=0.0.0.0 
