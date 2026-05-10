@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request,flash, url_for, redirect, Blueprint
 from flask_sqlalchemy import SQLAlchemy
-import os 
+import os
+import random
+import string
+from datetime import datetime
 
 # Create the app and config the app with the database
 app = Flask(__name__)
@@ -52,10 +55,77 @@ def index():
     return(render_template('index.html'))
 
 
-    
-@reservations_bp.route('/reservation')
+# ── Added by reservations branch ─────────────────────────────────────────────
+
+#Generate a random 6-character alphanumeric e-ticket number
+def generate_eticket():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+#Create the reservation route for GET and POST methods
+@reservations_bp.route('/reservation', methods=['GET', 'POST'])
 def reservation():
-    return render_template("reservation.html")
+    # Build occupied seats grid to display the seating chart
+    occupied_seats = [[False for column in range(4)] for row in range(12)]
+    for res in Reservation.query.all():
+        occupied_seats[res.seatRow][res.seatColumn] = True
+
+    if request.method == 'POST':
+        first_name = request.form.get('first_name', '').strip()
+        last_name  = request.form.get('last_name', '').strip()
+        seat_row   = request.form.get('seat_row')
+        seat_column = request.form.get('seat_column')
+
+        # Validate inputs
+        if not first_name or not last_name:
+            flash("Error: First and last name are required.")
+            return redirect(url_for('reservations.reservation'))
+
+        try:
+            seat_row = int(seat_row)
+            seat_column = int(seat_column)
+        except (TypeError, ValueError):
+            flash("Error: Row and column must be numbers.")
+            return redirect(url_for('reservations.reservation'))
+
+        if not (0 <= seat_row <= 11) or not (0 <= seat_column <= 3):
+            flash("Error: Row must be 0-11 and column must be 0-3.")
+            return redirect(url_for('reservations.reservation'))
+
+        if occupied_seats[seat_row][seat_column]:
+            flash(f"Error: Seat Row {seat_row}, Column {seat_column} is already taken. Please choose another seat.")
+            return redirect(url_for('reservations.reservation'))
+
+        # Generate a unique e-ticket number
+        eticket = generate_eticket()
+        while Reservation.query.filter_by(eTicketNumber=eticket).first():
+            eticket = generate_eticket()
+
+        # Insert the reservation into the database
+        passenger_name = f"{first_name} {last_name}"
+        new_reservation = Reservation(
+            passengerName=passenger_name,
+            seatRow=seat_row,
+            seatColumn=seat_column,
+            eTicketNumber=eticket,
+            created=datetime.utcnow()
+        )
+        db.session.add(new_reservation)
+        db.session.commit()
+
+        # Show confirmation with e-ticket code
+        return render_template(
+            'reservation.html',
+            reservation_code=eticket,
+            passenger_name=passenger_name,
+            seat_row=seat_row,
+            seat_column=seat_column,
+            occupied_seats=occupied_seats
+        )
+
+    return render_template('reservation.html', occupied_seats=occupied_seats)
+
+# ── End of reservations branch additions ─────────────────────────────────────
+
 
 #Create the get_cost_matrix
 def get_cost_matrix():
