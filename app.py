@@ -57,9 +57,16 @@ def index():
 
 # Added by reservations branch 
 
-#Generate a random 6-character alphanumeric e-ticket number
-def generate_eticket():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+#Generate an e-ticket number by alternating characters from the first name and INFOTC4320
+def generate_eticket(first_name):
+    info_string = "INFOTC4320"
+    eticket = ""
+    for i in range(max(len(first_name), len(info_string))):
+        if i < len(first_name):
+            eticket += first_name[i]
+        if i < len(info_string):
+            eticket += info_string[i]
+    return eticket
 
 #Create the reservation route for GET and POST methods
 @reservations_bp.route('/reservation', methods=['GET', 'POST'])
@@ -96,9 +103,8 @@ def reservation():
             return redirect(url_for('reservations.reservation'))
 
         # Generate a unique e-ticket number
-        eticket = generate_eticket()
-        while Reservation.query.filter_by(eTicketNumber=eticket).first():
-            eticket = generate_eticket()
+        eticket = generate_eticket(first_name)
+
 
         # Insert the reservation into the database
         passenger_name = f"{first_name} {last_name}"
