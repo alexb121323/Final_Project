@@ -55,7 +55,7 @@ def index():
     return(render_template('index.html'))
 
 
-# ── Added by reservations branch ─────────────────────────────────────────────
+# Added by reservations branch 
 
 #Generate a random 6-character alphanumeric e-ticket number
 def generate_eticket():
@@ -124,7 +124,7 @@ def reservation():
 
     return render_template('reservation.html', occupied_seats=occupied_seats)
 
-# ── End of reservations branch additions ─────────────────────────────────────
+# End of reservations branch additions
 
 
 #Create the get_cost_matrix
