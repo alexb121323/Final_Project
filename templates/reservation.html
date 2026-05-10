@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Reserve a Seat{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Reserve a Seat</h1>
+
+    {% if reservation_code %}
+        {# Success view after reservation is made #}
+        <div class="success-box">
+            <h2>Reservation Confirmed!</h2>
+            <p>Thank you, <strong>{{ passenger_name }}</strong>! Your seat has been reserved.</p>
+            <p>Row: <strong>{{ seat_row }}</strong> &nbsp;|&nbsp; Column: <strong>{{ seat_column }}</strong></p>
+            <p>Your e-Ticket Number: <strong class="ticket-code">{{ reservation_code }}</strong></p>
+            <p><a href="{{ url_for('reservations.index') }}">Return to Home</a></p>
+        </div>
+
+    {% else %}
+        {# Seating chart #}
+        <h2>Flight Seating Chart</h2>
+        <table class="seating-chart">
+            <tr>
+                <th></th>
+                <th>Col 0<br><small>Window ($100)</small></th>
+                <th>Col 1<br><small>Middle ($75)</small></th>
+                <th>Col 2<br><small>Aisle ($50)</small></th>
+                <th>Col 3<br><small>Window ($100)</small></th>
+            </tr>
+            {% for row in range(12) %}
+            <tr>
+                <td><strong>Row {{ row }}</strong></td>
+                {% for col in range(4) %}
+                    {% if occupied_seats[row][col] %}
+                        <td class="occupied">X</td>
+                    {% else %}
+                        <td class="available">O</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <p><span class="available-legend">O = Available</span> &nbsp; <span class="occupied-legend">X = Taken</span></p>
+
+        {# Reservation form #}
+        <h2>Book Your Seat</h2>
+        <form method="POST" action="{{ url_for('reservations.reservation') }}">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" required><br><br>
+
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" required><br><br>
+
+            <label for="seat_row">Seat Row (0–11):</label>
+            <input type="number" id="seat_row" name="seat_row" min="0" max="11" required><br><br>
+
+            <label for="seat_column">Seat Column (0–3):</label>
+            <input type="number" id="seat_column" name="seat_column" min="0" max="3" required><br><br>
+
+            <input type="submit" value="Reserve Seat">
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
