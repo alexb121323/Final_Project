@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Admin Dashboard</h1>
+</div>
+
+{% if occupied_seats %}
+    {# Seating chart #}
+    <div class="container">
+        <h2>Seating Chart</h2>
+        <table>
+            <tr>
+                <th></th>
+                {% for column in range(4) %}
+                    <th>Column {{ column }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in range(12) %}
+            <tr>
+                <td>Row {{ row }}</td>
+                {% for column in range(4) %}
+                    {% if occupied_seats[row][column] %}
+                        <td class="occupied">X</td>
+                    {% else %}
+                        <td class="available">O</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    {# Total sales #}
+    <div class="container">
+        <h2>Total Sales: ${{ total_sales }}</h2>
+    </div>
+
+    {# Reservations list #}
+    <div class="container">
+        <h2>Reservations</h2>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Row</th>
+                <th>Seat</th>
+                <th>eTicket</th>
+                <th>Action</th>
+            </tr>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.passengerName }}</td>
+                <td>{{ reservation.seatRow }}</td>
+                <td>{{ reservation.seatColumn }}</td>
+                <td>{{ reservation.eTicketNumber }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('reservations.delete_reservation', reservation_id=reservation.id) }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% else %}
+    {# Login form #}
+    <div class="container">
+        <h2>Admin Login</h2>
+        <form method="POST" action="{{ url_for('reservations.admin') }}">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+{% endif %}
+
+{% endblock %}
